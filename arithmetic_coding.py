@@ -6,13 +6,14 @@ accurateness: int = 8  # Округдение до знака
 
 def float_to_bin(f: float) -> str:
     result: str = ''
-    summary: float = 0.0
-    for i in range(1, 16):
-        if round(summary + 2 ** -i, accurateness) > f:
-            result += '0'
-        else:
-            summary += 2 ** -i
+    inter: float = f
+    for _ in range(15):
+        inter = round(inter * 2, accurateness)
+        if inter - 1 >= 0:
+            inter -= 1
             result += '1'
+        else:
+            result += '0'
     return result
 
 
