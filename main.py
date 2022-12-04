@@ -1,5 +1,5 @@
 from functools import reduce
-from arithmetic_coding import arithmetic_encode, arithmetic_decode
+from arithmetic_coding import arithmetic_coding
 
 
 accurateness: int = 6  # Округдение до знака
@@ -36,15 +36,15 @@ def main():
 
     # Сумма вероятностей должна быть равна 1.0
     if test_valid(input_ensemble=ensemble):
-        encode_table, L, X, code_word = arithmetic_encode(input_ensemble=ensemble, sequence=sequence)
-        decode_table = arithmetic_decode(input_ensemble=ensemble, code_word=code_word)
+        encode_table, decode_table, L, X, code_word = arithmetic_coding(input_ensemble=ensemble, sequence=sequence)
         # Записываем результат
         file_output = open(f'./output/output_{suffix}.txt', 'w')
         file_output.write('\n'.join([' '.join([str(x).ljust(10) for x in row]) for row in encode_table]))
         file_output.write('\n\n')
         file_output.write(f'L = {L}\n')
         file_output.write(f'X = {X}\n')
-        file_output.write(f'C = {code_word}\n')
+        file_output.write(f'C = {code_word}\n\n')
+        file_output.write('\n'.join([' '.join([str(x).ljust(12) for x in row]) for row in decode_table]))
         file_output.close()
     else:
         raise ValueError('Неверный вход!')
