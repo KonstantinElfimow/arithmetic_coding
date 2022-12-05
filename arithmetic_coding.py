@@ -49,7 +49,7 @@ def _create_decode_table(p_ensemble: dict, q_ensemble: dict, seq: list, code_wor
 
     for i, alpha in enumerate(seq):
         for s, q in q_ensemble.items():
-            _insert_row_with_format(decode_table, [i + 1, F_k, G_k, s, q, f'{round(F_k + q * G_k, accurateness)} < {x}',
+            _insert_row_with_format(decode_table, [i + 1, F_k, G_k, s, q, f'{round(F_k + q * G_k, accurateness)} < x ?',
                                                    round(F_k + q * G_k, accurateness) < x])
         _insert_row_with_format(decode_table, length=90)
         if i == 0:
