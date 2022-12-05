@@ -78,10 +78,11 @@ def _code_word_digital(F: float, G: float) -> float:
     return round(F + round(G / 2, accurateness), accurateness)
 
 
-def _float_to_bin(f: float) -> str:
+def _float_to_bin(f: float, length: int = 15) -> str:
+    length = max(15, length)
     result: str = ''
     inter: float = f
-    for _ in range(15):
+    for _ in range(length):
         inter = round(inter * 2, accurateness)
         if inter - 1 >= 0:
             inter -= 1
@@ -98,11 +99,11 @@ def _arithmetic_encode_algorythm(p_ensemble: dict, seq: list) -> (tuple, tuple, 
 
     L: int = _length_of_code_word(G)
     X: float = _code_word_digital(F, G)
-    code_word: str = _float_to_bin(X)
+    code_word: str = _float_to_bin(X, length=L)
 
     decode_table = _create_decode_table(p_ensemble, q_ensemble, seq, code_word[0: L])
 
-    return encode_table, decode_table, L, X, code_word
+    return encode_table, decode_table, L, X, code_word[0: 15]
 
 
 def arithmetic_coding(*, input_ensemble: dict, sequence: list) -> (tuple, tuple, int, float, str):
