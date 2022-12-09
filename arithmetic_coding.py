@@ -17,7 +17,7 @@ def _create_encode_table(p_ensemble: dict, q_ensemble: dict, seq: list) -> (tupl
     F_ik = 0
     G_ik = 1
     k: int = 0
-    _insert_row_with_format(encode_table, ['step k', 's_i', 'p(s_i)', 'q(s_i)', 'F(s_ik)', 'G(s_ik)'], 65)
+    _insert_row_with_format(encode_table, ['Шаг k', 's_i', 'p(s_i)', 'q(s_i)', 'F(s_ik)', 'G(s_ik)'], 65)
 
     _insert_row_with_format(encode_table, [k, '-', '-', '-', F_ik, G_ik], 65)
     k += 1
@@ -41,16 +41,16 @@ def _create_decode_table(p_ensemble: dict, q_ensemble: dict, seq: list, code_wor
     F_k = 0
     G_k = 1
     k: int = 0
-    _insert_row_with_format(decode_table, ['step k', 'F_k', 'G_k', 'Guess s_i', 'q(s_i)', 'Comparison', 'Solution'], 90)
+    _insert_row_with_format(decode_table, ['Шаг k', 'F_k', 'G_k', 'Гипотеза s_i', 'q(s_i)', 'Сравнение', 'Решение'], 105)
 
-    _insert_row_with_format(decode_table, [k, 'C = 0.{} -> X = {}'.format(code_word, X)], 90)
+    _insert_row_with_format(decode_table, [k, 'C = 0.{} -> X = {}'.format(code_word, X)], 105)
     k += 1
 
     for alpha in seq:
         for s, q in q_ensemble.items():
             _insert_row_with_format(decode_table, [k, F_k, G_k, s, q, f'{round(F_k + q * G_k, accurateness)} < x ?',
-                                                   round(F_k + q * G_k, accurateness) < X])
-        _insert_row_with_format(decode_table, length=90)
+                                                   int(round(F_k + q * G_k, accurateness) < X)])
+        _insert_row_with_format(decode_table, length=105)
         if k == 1:
             F_k = q_ensemble[alpha]
             G_k = p_ensemble[alpha]
@@ -68,14 +68,6 @@ def _make_q_ensemble(p_ensemble: dict) -> dict:
         q_ensemble[alpha] = q
         q = (round(q + p, accurateness))
     return q_ensemble
-
-
-def _length_of_code_word(G: float) -> int:
-    return ceil(- log2(G)) + 1
-
-
-def _code_word_digital(F: float, G: float) -> float:
-    return round(F + round(G / 2, accurateness), accurateness)
 
 
 def _float_to_bin(f: float, length: int = 15) -> str:
@@ -97,8 +89,8 @@ def _arithmetic_encode_algorythm(p_ensemble: dict, seq: list) -> (tuple, tuple, 
 
     encode_table, F, G = _create_encode_table(p_ensemble, q_ensemble, seq)
 
-    L: int = _length_of_code_word(G)
-    code_word: str = _float_to_bin(_code_word_digital(F, G), length=L)
+    L: int = ceil(-log2(G)) + 1
+    code_word: str = _float_to_bin(round(F + round(G / 2, accurateness), accurateness), length=L)
     X: float = round(sum([int(x) * 2 ** -(i + 1) for i, x in enumerate(code_word[0: L])]), accurateness)
 
     decode_table = _create_decode_table(p_ensemble, q_ensemble, seq, code_word[0: L], X)

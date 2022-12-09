@@ -39,12 +39,14 @@ def main():
         encode_table, decode_table, L, X, code_word = arithmetic_coding(input_ensemble=ensemble, sequence=sequence)
         # Записываем результат
         file_output = open(f'./output/output_{suffix}.txt', 'w')
+        file_output.write('Кодирования\n')
         file_output.write('\n'.join([' '.join([str(x).ljust(10) for x in row]) for row in encode_table]))
         file_output.write('\n\n')
         file_output.write(f'L = {L}\n')
-        file_output.write(f'X = {X}\n')
-        file_output.write(f'C = {code_word}\n\n')
-        file_output.write('\n'.join([' '.join([str(x).ljust(12) for x in row]) for row in decode_table]))
+        file_output.write(f'C = {code_word}\n')
+        file_output.write(f'X = {X}\n\n')
+        file_output.write('Декодирование\n')
+        file_output.write('\n'.join([' '.join([str(x).ljust(15) for x in row]) for row in decode_table]))
         file_output.close()
     else:
         raise ValueError('Неверный вход!')
