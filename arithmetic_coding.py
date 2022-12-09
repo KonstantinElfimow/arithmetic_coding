@@ -63,7 +63,7 @@ def _create_decode_table(p_ensemble: dict, q_ensemble: dict, seq: list, code_wor
 
 def _make_q_ensemble(p_ensemble: dict) -> dict:
     q_ensemble: dict = dict()
-    q: float = 0.0
+    q = 0
     for i, (alpha, p) in enumerate(p_ensemble.items()):
         q_ensemble[alpha] = q
         q = (round(q + p, accurateness))
