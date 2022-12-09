@@ -35,11 +35,7 @@ def _create_encode_table(p_ensemble: dict, q_ensemble: dict, seq: list) -> (tupl
     return tuple(encode_table), F_ik, G_ik
 
 
-def _bin_to_float(b: str) -> float:
-    return round(sum([int(x) * 2 ** -(i + 1) for i, x in enumerate(b)]), accurateness)
-
-
-def _create_decode_table(p_ensemble: dict, q_ensemble: dict, seq: list, code_word: str) -> tuple:
+def _create_decode_table(p_ensemble: dict, q_ensemble: dict, seq: list, code_word: str, X: float) -> tuple:
     decode_table: list = list()
 
     F_k = 0
@@ -47,14 +43,13 @@ def _create_decode_table(p_ensemble: dict, q_ensemble: dict, seq: list, code_wor
     k: int = 0
     _insert_row_with_format(decode_table, ['step k', 'F_k', 'G_k', 'Guess s_i', 'q(s_i)', 'Comparison', 'Solution'], 90)
 
-    x: float = _bin_to_float(code_word)
-    _insert_row_with_format(decode_table, [k, 'X = 0.{} -> x = {}'.format(code_word, x)], 90)
+    _insert_row_with_format(decode_table, [k, 'C = 0.{} -> X = {}'.format(code_word, X)], 90)
     k += 1
 
     for alpha in seq:
         for s, q in q_ensemble.items():
             _insert_row_with_format(decode_table, [k, F_k, G_k, s, q, f'{round(F_k + q * G_k, accurateness)} < x ?',
-                                                   round(F_k + q * G_k, accurateness) < x])
+                                                   round(F_k + q * G_k, accurateness) < X])
         _insert_row_with_format(decode_table, length=90)
         if k == 1:
             F_k = q_ensemble[alpha]
@@ -104,9 +99,9 @@ def _arithmetic_encode_algorythm(p_ensemble: dict, seq: list) -> (tuple, tuple, 
 
     L: int = _length_of_code_word(G)
     code_word: str = _float_to_bin(_code_word_digital(F, G), length=L)
-    X: float = _bin_to_float(code_word[0: L])
+    X: float = round(sum([int(x) * 2 ** -(i + 1) for i, x in enumerate(code_word[0: L])]), accurateness)
 
-    decode_table = _create_decode_table(p_ensemble, q_ensemble, seq, code_word[0: L])
+    decode_table = _create_decode_table(p_ensemble, q_ensemble, seq, code_word[0: L], X)
 
     return encode_table, decode_table, L, X, code_word[0: 15]
 
