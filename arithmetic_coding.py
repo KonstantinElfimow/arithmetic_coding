@@ -12,23 +12,25 @@ def _insert_row_with_format(table: list, l: list = None, length: int = 0) -> Non
 
 
 def _create_encode_table(p_ensemble: dict, q_ensemble: dict, seq: list) -> (tuple, float, float):
+    encode_table: list = list()
+
     F_ik = 0
     G_ik = 1
-
-    encode_table: list = list()
+    k: int = 0
     _insert_row_with_format(encode_table, ['step k', 's_i', 'p(s_i)', 'q(s_i)', 'F(s_ik)', 'G(s_ik)'], 65)
 
-    _insert_row_with_format(encode_table, [0, '-', '-', '-', F_ik, G_ik], 65)
+    _insert_row_with_format(encode_table, [k, '-', '-', '-', F_ik, G_ik], 65)
+    k += 1
 
-    for i, alpha in enumerate(seq):
-        if i == 0:
+    for alpha in seq:
+        if k == 1:
             F_ik = q_ensemble[alpha]
             G_ik = p_ensemble[alpha]
         else:
             F_ik = round(F_ik + round(G_ik * q_ensemble[alpha], accurateness), accurateness)
             G_ik = round(G_ik * p_ensemble[alpha], accurateness)
-
-        _insert_row_with_format(encode_table, [i + 1, alpha, p_ensemble[alpha], q_ensemble[alpha], F_ik, G_ik], 65)
+        _insert_row_with_format(encode_table, [k, alpha, p_ensemble[alpha], q_ensemble[alpha], F_ik, G_ik], 65)
+        k += 1
 
     return tuple(encode_table), F_ik, G_ik
 
@@ -38,26 +40,29 @@ def _bin_to_float(b: str) -> float:
 
 
 def _create_decode_table(p_ensemble: dict, q_ensemble: dict, seq: list, code_word: str) -> tuple:
+    decode_table: list = list()
+
     F_k = 0
     G_k = 1
-
-    decode_table: list = list()
+    k: int = 0
     _insert_row_with_format(decode_table, ['step k', 'F_k', 'G_k', 'Guess s_i', 'q(s_i)', 'Comparison', 'Solution'], 90)
 
     x: float = _bin_to_float(code_word)
-    _insert_row_with_format(decode_table, [0, 'X = 0.{} -> x = {}'.format(code_word, x)], 90)
+    _insert_row_with_format(decode_table, [k, 'X = 0.{} -> x = {}'.format(code_word, x)], 90)
+    k += 1
 
-    for i, alpha in enumerate(seq):
+    for alpha in seq:
         for s, q in q_ensemble.items():
-            _insert_row_with_format(decode_table, [i + 1, F_k, G_k, s, q, f'{round(F_k + q * G_k, accurateness)} < x ?',
+            _insert_row_with_format(decode_table, [k, F_k, G_k, s, q, f'{round(F_k + q * G_k, accurateness)} < x ?',
                                                    round(F_k + q * G_k, accurateness) < x])
         _insert_row_with_format(decode_table, length=90)
-        if i == 0:
+        if k == 1:
             F_k = q_ensemble[alpha]
             G_k = p_ensemble[alpha]
         else:
             F_k = round(F_k + round(G_k * q_ensemble[alpha], accurateness), accurateness)
             G_k = round(G_k * p_ensemble[alpha], accurateness)
+        k += 1
     return tuple(decode_table)
 
 
@@ -98,8 +103,8 @@ def _arithmetic_encode_algorythm(p_ensemble: dict, seq: list) -> (tuple, tuple, 
     encode_table, F, G = _create_encode_table(p_ensemble, q_ensemble, seq)
 
     L: int = _length_of_code_word(G)
-    X: float = _code_word_digital(F, G)
-    code_word: str = _float_to_bin(X, length=L)
+    code_word: str = _float_to_bin(_code_word_digital(F, G), length=L)
+    X: float = _bin_to_float(code_word[0: L])
 
     decode_table = _create_decode_table(p_ensemble, q_ensemble, seq, code_word[0: L])
 
